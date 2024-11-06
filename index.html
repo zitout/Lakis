@@ -532,7 +532,35 @@ body {
 
 </head>
 <body>
-   
+    <!-- نافذة تسجيل الدخول -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-box animate__animated animate__fadeIn">
+            <i class="fas fa-lock fa-2x" style="color: #2196f3; margin-bottom: 15px;"></i>
+            <h2>تسجيل الدخول</h2>
+            <form id="loginForm" onsubmit="return checkPassword(event)">
+                <div class="input-group">
+                    <input type="password" id="passwordInput" 
+                           placeholder="كلمة المرور" 
+                           autocomplete="current-password"
+                           required>
+                </div>
+                <div id="errorMessage" class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    كلمة المرور غير صحيحة
+                </div>
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    دخول
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- زر تسجيل الخروج -->
+    <button id="logoutBtn" class="logout-btn" aria-label="تسجيل الخروج">
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="btn-text">تسجيل الخروج</span>
+    </button>
 
     <!-- المحتوى الرئيسي -->
     <div id="mainContent" class="container">
@@ -832,8 +860,39 @@ async function initializeApp() {
 }
  
     
+// تبسيط دالة checkPassword
+function checkPassword(event) {
+    event.preventDefault();
+    const password = document.getElementById('passwordInput').value;
+    
+    if (password === '2022') {
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+        document.getElementById('logoutBtn').style.display = 'block';
+        document.getElementById('passwordInput').value = '';
+        document.getElementById('errorMessage').style.display = 'none';
+        loadTransactions();
+        return false;
+    } else {
+        document.getElementById('errorMessage').style.display = 'block';
+        document.getElementById('passwordInput').value = '';
+    }
+    return false;
+}
+// إضافة دالة تسجيل الخروج
+function logout() {
+    document.getElementById('loginOverlay').style.display = 'flex';
+    document.getElementById('mainContent').style.display = 'none';
+    document.getElementById('logoutBtn').style.display = 'none';
+    document.getElementById('passwordInput').value = '';
+    document.getElementById('errorMessage').style.display = 'none';
+    transactions = [];
+    totalInputAmount = 0;
+    totalOutputAmount = 0;
+}
 
-
+// إضافة مستمع حدث لزر تسجيل الخروج
+document.getElementById('logoutBtn').addEventListener('click', logout);
     
     async function checkServerConnection() {
     try {
