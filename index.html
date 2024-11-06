@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <!-- تحسين viewport للأجهزة المحمولة -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="نظام إدارة أموال العمل - تتبع المدخلات والمخرجات المالية">
+    <meta name="theme-color" content="#2196f3">
+    
+    <title>نظام إدارة أموال العمل</title>
+    
+    <!-- تحسين تحميل الخطوط باستخدام display=swap -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- تحميل Font Awesome بشكل أسرع -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
+          integrity="sha512-..." 
+          crossorigin="anonymous">
+    
+    <!-- تحسين تحميل SweetAlert2 -->
+    <script defer src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- تحميل Animate.css عند الحاجة فقط -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+          media="print" onload="this.media='all'">
+    
+    <!-- تحسينات PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192x192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- تحسينات SEO -->
+    <meta name="keywords" content="نظام إدارة أموال, محاسبة, تتبع المال, إدارة مالية, تطبيق محاسبة">
+    <meta name="author" content="Your Name">
+    <meta name="robots" content="index, follow">
+    
+    <!-- تحسينات Open Graph -->
+    <meta property="og:title" content="نظام إدارة أموال العمل">
+    <meta property="og:description" content="نظام متكامل لإدارة وتتبع الأموال">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="og-image.jpg">
+    <meta property="og:url" content="https://your-website.com">
+    
+    <!-- تحسين Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    
+   
+    <style>
+      /* الإعدادات الأساسية */
+* {
+    box-sizing: border-box;
+    font-family: 'Cairo', sans-serif;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    padding: 10px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.5;
+    color: #333;
+}
+
+/* نافذة تسجيل الدخول */
+.login-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.login-box {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    width: 90%;
+    max-width: 350px;
+    text-align: center;
+    animation: fadeIn 0.5s ease;
+}
+
+.login-box h2 {
+    margin-bottom: 20px;
+    color: #2c3e50;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.login-box input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.login-box input:focus {
+    border-color: #2196f3;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+.login-box button {
+    background: #2196f3;
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+}
+
+.login-box button:hover {
+    background: #1976d2;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #2196f3;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* المحتوى الرئيسي */
+.container {
+    max-width: 100%;
+    margin: 10px auto;
+    background: white;
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    display: none;
+    animation: slideUp 0.5s ease;
+}
+
+/* نماذج الإدخال */
+.forms-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.form-section {
+    padding: 20px;
+    border-radius: 12px;
+    transition: transform 0.3s ease;
+}
+
+.input-section {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+}
+
+.output-section {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 15px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+    border-color: #2196f3;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+        /* الإحصائيات */
+.statistics {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.stat-card {
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    background: white;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.stat-card h3 {
+    color: #2c3e50;
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.stat-card p {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2196f3;
+}
+
+/* جدول المعاملات */
+.transactions-table {
+    width: 100%;
+    margin-top: 20px;
+    overflow-x: auto;
+    display: block;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+.transactions-table::-webkit-scrollbar {
+    height: 6px;
+}
+
+.transactions-table::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.transactions-table::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.transactions-table table {
+    width: 100%;
+    min-width: 600px;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 15px;
+}
+
+.transactions-table th {
+    background: #2196f3;
+    color: white;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.transactions-table td {
+    padding: 12px;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.transactions-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* الأزرار */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.btn-input {
+    background: #2196f3;
+    color: white;
+}
+
+.btn-input:hover, .btn-input:focus {
+    background: #1976d2;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+}
+
+.btn-output {
+    background: #4caf50;
+    color: white;
+}
+
+.btn-output:hover, .btn-output:focus {
+    background: #388e3c;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+}
+
+.action-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+    margin: 2px;
+    border-radius: 6px;
+}
+
+.edit-btn {
+    background: #ff9800;
+    color: white;
+}
+
+.edit-btn:hover {
+    background: #f57c00;
+}
+
+.delete-btn {
+    background: #f44336;
+    color: white;
+}
+
+.delete-btn:hover {
+    background: #d32f2f;
+}
+
+/* زر تسجيل الخروج */
+.logout-btn {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    padding: 8px 16px;
+    background: #f44336;
+    color: white;
+    font-size: 14px;
+    border-radius: 8px;
+    z-index: 100;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.logout-btn:hover {
+    background: #d32f2f;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(244, 67, 54, 0.3);
+}
+
+/* شارات نوع المعاملة */
+.transaction-type-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.input-badge {
+    background: #e3f2fd;
+    color: #1976d2;
+    border: 2px solid #1976d2;
+}
+
+.output-badge {
+    background: #e8f5e9;
+    color: #388e3c;
+    border: 2px solid #388e3c;
+}
+
+/* التأثيرات الحركية */
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+    }
+    to { 
+        opacity: 1; 
+    }
+}
+
+@keyframes slideUp {
+    from { 
+        transform: translateY(15px);
+        opacity: 0;
+    }
+    to { 
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes spin {
+    0% { 
+        transform: rotate(0deg); 
+    }
+    100% { 
+        transform: rotate(360deg); 
+    }
+}
+
+/* التجاوب مع الشاشات */
+@media (min-width: 768px) {
+    body {
+        padding: 20px;
+    }
+
+    .container {
+        padding: 30px;
+        margin: 20px auto;
+        max-width: 1200px;
+    }
+
+    .forms-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
+
+    .statistics {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+
+    .login-box {
+        padding: 40px;
+    }
+
+    .form-section:hover {
+        transform: translateY(-5px);
+    }
+}
+
+/* تحسينات للشاشات الصغيرة جداً */
+@media (max-width: 360px) {
+    body {
+        padding: 5px;
+    }
+
+    .container {
+        padding: 10px;
+    }
+
+    .form-section {
+        padding: 15px;
+    }
+
+    .login-box {
+        padding: 20px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
+    .stat-card {
+        padding: 12px;
+    }
+
+    .transactions-table th,
+    .transactions-table td {
+        padding: 8px;
+        font-size: 13px;
+    }
+}
+
+/* دعم الوضع المظلم للنظام */
+@media (prefers-color-scheme: dark) {
+    .login-box,
+    .container,
+    .stat-card {
+        background: #1f1f1f;
+        color: #fff;
+    }
+
+    .form-section {
+        background: #2d2d2d;
+    }
+
+    .transactions-table td {
+        border-bottom-color: #333;
+    }
+
+    .transactions-table tr:hover {
+        background-color: #2d2d2d;
+    }
+}
+</style>
+    
+    
+
+</head>
+<body>
+   
+
+    <!-- المحتوى الرئيسي -->
+    <div id="mainContent" class="container">
+        <header class="main-header">
+            <h1>
+                <i class="fas fa-money-check-alt"></i>
+                <span>نظام إدارة أموال العمل</span>
+            </h1>
+            <p class="system-date" id="systemDate"></p>
+        </header>
+
+        <div class="forms-container">
+            <!-- قسم إدخال أموال العمل -->
+            <section class="form-section input-section animate__animated animate__fadeInLeft">
+                <h2>
+                    <i class="fas fa-arrow-circle-down"></i>
+                    <span>إدخال أموال للعمل</span>
+                </h2>
+                <form id="inputForm" class="transaction-form">
+                    <div class="form-group">
+                        <label for="inputAmount">
+                            <i class="fas fa-coins"></i>
+                            المبلغ المدخل:
+                        </label>
+                        <input type="number" 
+                               id="inputAmount" 
+                               min="0" 
+                               step="0.01"
+                               inputmode="decimal"
+                               required>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputNotes">
+                            <i class="fas fa-comment-alt"></i>
+                            ملاحظات:
+                        </label>
+                        <input type="text" 
+                               id="inputNotes" 
+                               maxlength="100">
+                    </div>
+                    <button type="submit" class="btn btn-input">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>إضافة مبلغ</span>
+                    </button>
+                </form>
+            </section>
+
+            <!-- قسم الأموال القادمة -->
+            <section class="form-section output-section animate__animated animate__fadeInRight">
+                <h2>
+                    <i class="fas fa-arrow-circle-up"></i>
+                    <span>الأموال القادمة</span>
+                </h2>
+                <form id="outputForm" class="transaction-form">
+                    <div class="form-group">
+                        <label for="outputAmount">
+                            <i class="fas fa-coins"></i>
+                            المبلغ المستلم:
+                        </label>
+                        <input type="number" 
+                               id="outputAmount" 
+                               min="0" 
+                               step="0.01"
+                               inputmode="decimal"
+                               required>
+                    </div>
+                    <div class="form-group">
+                        <label for="outputNotes">
+                            <i class="fas fa-comment-alt"></i>
+                            ملاحظات:
+                        </label>
+                        <input type="text" 
+                               id="outputNotes" 
+                               maxlength="100">
+                    </div>
+                    <button type="submit" class="btn btn-output">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>تسجيل مبلغ</span>
+                    </button>
+                </form>
+            </section>
+        </div>
+
+        <!-- الإحصائيات -->
+        <div class="statistics animate__animated animate__fadeInUp">
+            <div class="stat-card" role="status">
+                <i class="fas fa-money-bill-wave"></i>
+                <h3>إجمالي المدخلات</h3>
+                <p id="totalInput">0 دج</p>
+            </div>
+            <div class="stat-card" role="status">
+                <i class="fas fa-hand-holding-usd"></i>
+                <h3>إجمالي العائدات</h3>
+                <p id="totalOutput">0 دج</p>
+            </div>
+            <div class="stat-card" role="status">
+                <i class="fas fa-chart-line"></i>
+                <h3>هامش الربح</h3>
+                <p id="profitMargin">0%</p>
+            </div>
+        </div>
+
+        <!-- جدول العمليات -->
+        <section class="transactions-section animate__animated animate__fadeIn">
+            <h2>
+                <i class="fas fa-history"></i>
+                <span>سجل العمليات</span>
+            </h2>
+            <div class="table-container">
+                <table class="transactions-table" role="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">التاريخ</th>
+                            <th scope="col">النوع</th>
+                            <th scope="col">المبلغ</th>
+                            <th scope="col">ملاحظات</th>
+                            <th scope="col">الهامش</th>
+                            <th scope="col">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsBody"></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- نافذة التعديل -->
+    <div id="editModal" class="modal">
+        <div class="modal-content animate__animated animate__zoomIn">
+            <h2>تعديل المعاملة</h2>
+            <form id="editForm">
+                <input type="hidden" id="editIndex">
+                <div class="form-group">
+                    <label for="editAmount">المبلغ:</label>
+                    <input type="number" 
+                           id="editAmount" 
+                           min="0" 
+                           step="0.01"
+                           required>
+                </div>
+                <div class="form-group">
+                    <label for="editNotes">ملاحظات:</label>
+                    <input type="text" 
+                           id="editNotes" 
+                           maxlength="100">
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn btn-save">
+                        <i class="fas fa-save"></i>
+                        <span>حفظ</span>
+                    </button>
+                    <button type="button" 
+                            class="btn btn-cancel" 
+                            onclick="closeEditModal()">
+                        <i class="fas fa-times"></i>
+                        <span>إلغاء</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner" role="alert" aria-busy="true">
+        <div class="spinner"></div>
+        <p>جاري التحميل...</p>
+    </div>
+</body>
+</html>
+    
+<script>
+// المتغيرات العامة
+let transactions = [];
+let totalInputAmount = 0;
+let totalOutputAmount = 0;
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZ3jV1jSQIcutM55aWUa8DHasDlPvY9t8raQJBeQOVRKRqsUjs8dEFhGlipJDK5SWR/exec';
+
+
+// دالة تحميل البيانات من Google Sheets
+async function loadTransactions() {
+    try {
+        showLoadingSpinner();
+        const response = await fetch(SCRIPT_URL);
+        const result = await response.json();
+        
+        // التأكد من أن البيانات موجودة وتحتوي على مصفوفة data
+        if (result && result.data) {
+            transactions = [];
+            totalInputAmount = 0;
+            totalOutputAmount = 0;
+
+            // تجاهل الصف الأول (العناوين) وتحويل البيانات
+            result.data.slice(1).forEach(row => {
+                if (row.length >= 4) { // التأكد من وجود جميع البيانات المطلوبة
+                    const transaction = {
+                        datetime: row[0],
+                        type: row[1],
+                        amount: parseFloat(row[2]) || 0,
+                        notes: row[3] || '',
+                        profitMargin: row[4] || '0%'
+                    };
+
+                    transactions.push(transaction);
+
+                    // تحديث المجاميع
+                    if (transaction.type === 'إدخال للعمل') {
+                        totalInputAmount += transaction.amount;
+                    } else {
+                        totalOutputAmount += transaction.amount;
+                    }
+                }
+            });
+
+            updateUI();
+            console.log("تم تحميل البيانات بنجاح:", transactions);
+        }
+    } catch (error) {
+        console.error("خطأ في تحميل البيانات:", error);
+        showNotification('حدث خطأ في تحميل البيانات', 'error');
+    } finally {
+        hideLoadingSpinner();
+    }
+}
+
+// تحسين دالة updateUI
+function updateUI() {
+    const tbody = document.getElementById('transactionsBody');
+    tbody.innerHTML = ''; // مسح المحتوى القديم
+
+    // ترتيب المعاملات من الأحدث إلى الأقدم
+    transactions.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+
+    transactions.forEach((transaction, index) => {
+        const row = document.createElement('tr');
+        const profitMargin = calculateProfitMargin();
+        
+        row.classList.add('animate__animated', 'animate__fadeIn');
+        row.classList.add(transaction.type === 'إدخال للعمل' ? 'transaction-input' : 'transaction-output');
+        
+        row.innerHTML = `
+            <td>${transaction.datetime}</td>
+            <td>
+                <span class="transaction-type-badge ${transaction.type === 'إدخال للعمل' ? 'input-badge' : 'output-badge'}">
+                    ${transaction.type}
+                </span>
+            </td>
+            <td>${formatCurrency(transaction.amount)}</td>
+            <td>${transaction.notes || '-'}</td>
+            <td class="${profitMargin >= 0 ? 'profit' : 'loss'}">
+                <i class="fas ${profitMargin >= 0 ? 'fa-arrow-up' : 'fa-arrow-down'}"></i>
+                ${profitMargin.toFixed(2)}%
+            </td>
+            <td>
+                <div class="action-buttons">
+                    <button class="action-btn edit-btn" onclick="openEditModal(${index})" title="تعديل">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete-btn" onclick="deleteTransaction(${index})" title="حذف">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+
+    // تحديث الإحصائيات
+    document.getElementById('totalInput').textContent = formatCurrency(totalInputAmount);
+    document.getElementById('totalOutput').textContent = formatCurrency(totalOutputAmount);
+    document.getElementById('profitMargin').textContent = `${calculateProfitMargin().toFixed(2)}%`;
+}
+
+// إضافة دالة لتنسيق العملة
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('ar-DZ', {
+        style: 'currency',
+        currency: 'DZD',
+        minimumFractionDigits: 2
+    }).format(amount);
+}
+
+// تحسين دالة التهيئة
+async function initializeApp() {
+    try {
+        showLoadingSpinner();
+        await loadTransactions();
+        updateSystemDate();
+        setInterval(updateSystemDate, 60000);
+        showNotification('تم تحميل البيانات بنجاح', 'success');
+    } catch (error) {
+        console.error("خطأ في تهيئة التطبيق:", error);
+        showNotification('حدث خطأ في تهيئة التطبيق', 'error');
+    } finally {
+        hideLoadingSpinner();
+    }
+}
+ 
+    
+
+
+    
+    async function checkServerConnection() {
+    try {
+        const response = await fetch(SCRIPT_URL);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return true;
+    } catch (error) {
+        console.error("خطأ في الاتصال بالخادم:", error);
+        showNotification('فشل الاتصال بالخادم، يرجى التحقق من اتصال الإنترنت', 'error');
+        return false;
+    }
+}
+
+    
+    function updateCharts() {
+    // تحديث الإحصائيات البصرية
+    const totalInputElement = document.getElementById('totalInput');
+    const totalOutputElement = document.getElementById('totalOutput');
+    const profitMarginElement = document.getElementById('profitMargin');
+
+    totalInputElement.innerHTML = `
+        <i class="fas fa-money-bill-wave"></i>
+        ${formatCurrency(totalInputAmount)}
+    `;
+    
+    totalOutputElement.innerHTML = `
+        <i class="fas fa-hand-holding-usd"></i>
+        ${formatCurrency(totalOutputAmount)}
+    `;
+
+    const profitMargin = calculateProfitMargin();
+    const profitIcon = profitMargin >= 0 ? 'fa-arrow-up' : 'fa-arrow-down';
+    const profitClass = profitMargin >= 0 ? 'profit' : 'loss';
+    
+    profitMarginElement.innerHTML = `
+        <i class="fas ${profitIcon}"></i>
+        ${profitMargin.toFixed(2)}%
+    `;
+    profitMarginElement.className = profitClass;
+}
+
+// دالة إضافة صف جديد مع تأثيرات حركية
+function addTransactionRow(transaction, index) {
+    const tbody = document.getElementById('transactionsBody');
+    const row = document.createElement('tr');
+    
+    // إضافة التأثيرات الحركية
+    row.classList.add('animate__animated', 'animate__fadeIn');
+    
+    // إضافة class للتمييز بين أنواع المعاملات
+    const transactionClass = transaction.type === 'إدخال للعمل' ? 'transaction-input' : 'transaction-output';
+    row.classList.add(transactionClass);
+    
+    // استخدام نفس طريقة حساب هامش الربح من الكود الأصلي
+    const profitMargin = totalInputAmount > 0 ? ((totalOutputAmount - totalInputAmount) / totalInputAmount * 100) : 0;
+    
+    // الاحتفاظ بنفس هيكل البيانات مع إضافة التحسينات الجمالية
+    row.innerHTML = `
+        <td>${transaction.datetime}</td>
+        <td>
+            <span class="transaction-type-badge ${transaction.type === 'إدخال للعمل' ? 'input-badge' : 'output-badge'}">
+                ${transaction.type}
+            </span>
+        </td>
+        <td>${transaction.amount.toFixed(2)} دج</td>
+        <td>${transaction.notes || '-'}</td>
+        <td class="${profitMargin >= 0 ? 'profit' : 'loss'}">
+            <i class="fas ${profitMargin >= 0 ? 'fa-arrow-up' : 'fa-arrow-down'}"></i>
+            ${profitMargin.toFixed(2)}%
+        </td>
+        <td>
+            <div class="action-buttons">
+                <button class="action-btn edit-btn" onclick="openEditModal(${index})" title="تعديل">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn delete-btn" onclick="deleteTransaction(${index})" title="حذف">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </td>
+    `;
+    
+    tbody.insertBefore(row, tbody.firstChild);
+}
+    
+// دالة معالجة إضافة معاملة جديدة
+async function handleTransactionSubmit(formId, type) {
+    const form = document.getElementById(formId);
+    const amount = parseFloat(form.querySelector('[type="number"]').value);
+    const notes = form.querySelector('[type="text"]').value;
+
+    const transaction = {
+        datetime: new Date().toLocaleString('ar-DZ', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        }),
+        type: type,
+        amount: amount,
+        notes: notes
+    };
+
+    try {
+        showLoadingSpinner();
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(transaction)
+        });
+
+        if (response.ok) {
+            if (type === 'إدخال للعمل') {
+                totalInputAmount += amount;
+            } else {
+                totalOutputAmount += amount;
+            }
+            transactions.push(transaction);
+            updateUI();
+            form.reset();
+            showNotification('تمت إضافة المعاملة بنجاح', 'success');
+        }
+    } catch (error) {
+        console.error("خطأ في حفظ المعاملة:", error);
+        showNotification('حدث خطأ في حفظ المعاملة', 'error');
+    } finally {
+        hideLoadingSpinner();
+    }
+}
+    
+// دالة حذف معاملة مع تأكيد
+async function deleteTransaction(index) {
+    try {
+        const result = await Swal.fire({
+            title: 'هل أنت متأكد؟',
+            text: "لا يمكن التراجع عن هذا الإجراء!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'نعم، احذف!',
+            cancelButtonText: 'إلغاء'
+        });
+
+        if (result.isConfirmed) {
+            showLoadingSpinner();
+            const transaction = transactions[index];
+            
+            if (transaction.type === 'إدخال للعمل') {
+                totalInputAmount -= transaction.amount;
+            } else {
+                totalOutputAmount -= transaction.amount;
+            }
+
+            const response = await fetch(`${SCRIPT_URL}?action=delete`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ index })
+            });
+
+            if (response.ok) {
+                transactions.splice(index, 1);
+                await updateUI();
+                showNotification('تم حذف المعاملة بنجاح', 'success');
+            }
+        }
+    } catch (error) {
+        console.error("خطأ في حذف المعاملة:", error);
+        showNotification('حدث خطأ في حذف المعاملة', 'error');
+    } finally {
+        hideLoadingSpinner();
+    }
+}
+
+  
+function updateSystemDate() {
+    const systemDate = document.getElementById('systemDate');
+    systemDate.textContent = formatDate(new Date());
+}
+    
+
+// دوال مساعدة
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('ar-DZ', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+    }).format(date);
+}
+
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('ar-DZ', {
+        style: 'currency',
+        currency: 'DZD',
+        minimumFractionDigits: 2
+    }).format(amount);
+}
+
+function calculateProfitMargin() {
+    return totalInputAmount > 0 ? 
+        ((totalOutputAmount - totalInputAmount) / totalInputAmount * 100) : 0;
+}
+
+// دوال التنبيهات والـ Loading
+function showNotification(message, type) {
+    Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: type,
+        title: message,
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+    });
+}
+
+function showLoadingSpinner() {
+    document.getElementById('loadingSpinner').style.display = 'flex';
+}
+
+function hideLoadingSpinner() {
+    document.getElementById('loadingSpinner').style.display = 'none';
+}
+
+// تعديل Event Listeners
+window.addEventListener('load', () => {
+    document.getElementById('loginOverlay').style.display = 'flex';
+    document.getElementById('mainContent').style.display = 'none';
+    document.getElementById('logoutBtn').style.display = 'none';
+});
+
+
+document.getElementById('inputForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    handleTransactionSubmit('inputForm', 'إدخال للعمل');
+});
+
+document.getElementById('outputForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    handleTransactionSubmit('outputForm', 'عائد من العمل');
+});
+
+
+</script>
+    
+</body>
+</html>
